@@ -5,6 +5,9 @@ const cookieParser=require('cookie-parser');
 const db=require('./config/config').get(process.env.NODE_ENV);
 const User=require('./models/user');
 const Child=require('./models/child');
+const State=require('./models/state');
+const District=require('./models/district');
+
 const {auth} =require('./middlewares/auth');
 
 const app=express();
@@ -53,8 +56,72 @@ app.post('/api/register',function(req,res){
    });
 });
 
-   // create and save a new note
-   app.post('/api/child',function(req,res){
+// create and save a new state
+app.post('/api/state/register',function(req,res){
+
+    if(!req.body.state ) {
+        return res.status(400).send({
+            message: "This field is required"
+        });
+    }
+
+    const newstate=State({
+        state: req.body.state
+    });
+
+        newstate.save(function(err,doc){
+            if(err) return res.status(400).json(err);
+            res.status(201).json({
+                post : true,
+                state : doc
+            });
+        });
+    });
+
+    // find a state by id
+    app.get('/api/findstate/:Id',function(req,res){
+        State.findById(req.params.Id,function(err,doc){
+            if(err) return res.status(400).send(err);
+            if(!doc) return res.status(404).json({message : "State with given Id is not found"});
+            res.status(200).json(doc);
+        })
+});
+
+
+    // create and save a new district
+    app.post('/api/district/register',function(req,res){
+
+        if(!req.body.district) {
+            return res.status(400).send({
+                message: "This field is required"
+            });
+        }
+
+        const newdistrict=District({
+            district:req.body.district
+        });
+
+            newdistrict.save(function(err,doc){
+                if(err) return res.status(400).json(err);
+                res.status(201).json({
+                    post : true,
+                    district : doc
+                });
+            });
+        });
+
+        // find a district by id
+        app.get('/api/finddistrict/:Id',function(req,res){
+            District.findById(req.params.Id,function(err,doc){
+                if(err) return res.status(400).send(err);
+                if(!doc) return res.status(404).json({message : "district with given Id is not found"});
+                res.status(200).json(doc);
+            })
+ });
+
+
+   // create and save a new child
+   app.post('/api/child/register',function(req,res){
 
        if(!req.body.name||!req.body.sex||!req.body.dob|| !req.body.fathersName||!req.body.mothersName||!req.body.state ||
        !req.body.district) {
@@ -82,13 +149,13 @@ app.post('/api/register',function(req,res){
            });
        });
 
-//find child by id
-app.get('/api/findchild/:Id',function(req,res){
-    Child.findById(req.params.Id,function(err,doc){
-        if(err) return res.status(400).send(err);
-        if(!doc) return res.status(404).json({message : "Child with given Id is not found"});
-        res.status(200).json(doc);
-    })
+       // find a child by id
+       app.get('/api/findchild/:Id',function(req,res){
+           Child.findById(req.params.Id,function(err,doc){
+               if(err) return res.status(400).send(err);
+               if(!doc) return res.status(404).json({message : "Child with given Id is not found"});
+               res.status(200).json(doc);
+           })
 });
 
 
@@ -129,7 +196,7 @@ app.get('/api/profile',auth,function(req,res){
             isAuth: true,
             id: req.user._id,
             email: req.user.email,
-            name: req.user.firstname + req.user.lastname
+            name: req.user.name
 
         })
 })
