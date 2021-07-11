@@ -7,7 +7,7 @@ This is user regisstration, login and logout app bulit with json web token using
 You need to have installed Node.js, NPM and MongoDB in your system.
 
 ## Installing 
-> npm init
+> npm install express body-parser cookie-parser bcrypt mongoose jsonwebtoken nodemon
 
 ## To run
 >node index.js
